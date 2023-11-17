@@ -6,6 +6,7 @@
 
 
 ;; global vars 
+(def max-disk 8)
 
 (def width 360)
 (def height 250)
@@ -50,8 +51,19 @@
     (draw-towers ctx)
     (draw-disks ctx 3)))
 
+;; MECHANICS
+;; todo: refactor, theres a way using math to know where disk is placed
+(defn is-mouse-inside-disk? [mouseX mouseY diskX diskY]
+  (and (>= mouseX diskX)
+       (<= mouseX (+ diskX disk-width))
+       (>= mouseY diskY)
+       (<= mouseY (+ diskY disk-height))))
+
+
 (defn tower-of-hanoi []
-  (let [hanoi-canvas (reagent/atom nil) discs (reagent/atom 3)]
+  (let [hanoi-canvas (reagent/atom nil) 
+        number-of-discs (reagent/atom 3) 
+        discs (reagent/atom [{:tower 0 :posY 0 } {:tower 0 :posY 1} {:tower 0 :posY 2}])] ;; disc 0 represent the smallest disc
     (reagent/create-class
      {;;   :component-did-update
     ;;   (fn [this]
