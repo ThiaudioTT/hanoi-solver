@@ -13,6 +13,9 @@
 (def tower-height (/ height 2))
 (def tower-edge-spacing 40)
 (def tower-color "black")
+(def disk-height 10)
+(def disk-width 100)
+(def disk-colors ["red" "blue" "green" "yellow"])
 
 (def canvas-style
   {:width width
@@ -22,8 +25,9 @@
 ;; -------------------------
 ;; main program
 
-;; args are canvas, context, x, y
+;; TOWERS
 (defn draw-tower [ctx x y]
+  (set! (.-fillStyle ctx) tower-color)
   (.fillRect ctx x y tower-width tower-height))
 
 (defn draw-towers [ctx]
@@ -31,9 +35,20 @@
   (draw-tower ctx (/ width 2) tower-height)
   (draw-tower ctx (- width tower-edge-spacing tower-width) tower-height))
 
+;; DISKS
+(defn draw-disk [ctx x y]
+  (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
+  (.fillRect ctx x y tower-width tower-height))
+
+;; todo: implement N later
+(defn draw-disks [ctx n]
+  (draw-disk ctx tower-edge-spacing (- height disk-height))
+  )
+
 (defn draw-canvas-content [canvas]
   (let [ctx (.getContext canvas "2d")]
-    (draw-towers ctx)))
+    (draw-towers ctx)
+    (draw-disks ctx 3)))
 
 (defn tower-of-hanoi []
   (let [hanoi-canvas (reagent/atom nil) discs (reagent/atom 3)]
