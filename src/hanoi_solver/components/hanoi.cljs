@@ -23,6 +23,15 @@
    :height height
    :style {:border "1px solid black"}})
 
+(def discs (reagent/atom discs [{:tower 0 :posY 0} {:tower 0 :posY 1} {:tower 0 :posY 2}])) ;; disc 0 is the smallest
+(comment 
+  "An example of discs:
+    1
+    0   2
+   --- --- ---
+    0 is the biggest disc (the first) and 2 is the smallest (the last)
+   ")
+
 ;; -------------------------
 ;; main program
 
@@ -52,18 +61,51 @@
     (draw-disks ctx 3)))
 
 ;; MECHANICS
+
+;; mechanicis helper functions
+
+;; disk is a integer, return a map with the disk position
+(defn get-disk-X [disk]
+  ;; todo: I know it is ugly, I will fix it later nyaa <3
+  (if (= (:tower disk) 1)
+    (/ width 2)
+    (if (= (:tower disk) 2)
+      (- width tower-edge-spacing tower-width)
+      tower-edge-spacing)))
+
+;; (defn get-disk-Y [disk]
+;;   (+ (- height tower-width) (* (:posY disk) disk-height)))
+(defn get-disk-Y [disk] ;; todo: verify for inputs types
+  (+ (- height tower-width) (* (:posY (@discs disk)) disk-height))) ;;  ! fix this
+;;** Probably we can use a function to access the disk :posY key.
+
+(defn get-disk-pos [disk]
+  {:x (get-disk-X disk)
+   :y (get-disk-Y disk)})
+
 ;; todo: refactor, theres a way using math to know where disk is placed
 (defn is-mouse-inside-disk? [mouseX mouseY diskX diskY]
+  (println mouseX mouseY diskX diskY)
   (and (>= mouseX diskX)
-       (<= mouseX (+ diskX disk-width))
+       (<= mouseX (+ diskX disk-width)) ;; !! todo: disk-width is dinamic
        (>= mouseY diskY)
        (<= mouseY (+ diskY disk-height))))
 
+;; handle mouse event
+(defn handle-mousedown [event]
+  (clog event)
+  ;; (clog (.-target event))
+  (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+        mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+        diskX (get-disk-X 0)
+        diskY (get-disk-Y 0)]
+    (clog (get-disk-Y 0))
+    (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
+      (clog "mouse is inside disk")
+      (clog "mouse is OUTSIDE disk"))))
 
 (defn tower-of-hanoi []
-  (let [hanoi-canvas (reagent/atom nil) 
-        number-of-discs (reagent/atom 3) 
-        discs (reagent/atom [{:tower 0 :posY 0 } {:tower 0 :posY 1} {:tower 0 :posY 2}])] ;; disc 0 represent the smallest disc
+  (let [hanoi-canvas (reagent/atom nil)]
     (reagent/create-class
      {;;   :component-did-update
     ;;   (fn [this]
@@ -74,7 +116,8 @@
       (fn [this]
         (clog (dom/dom-node this))
         (reset! hanoi-canvas (.-firstChild (dom/dom-node this)))
-        (draw-canvas-content @hanoi-canvas))
+        (draw-canvas-content @hanoi-canvas)
+        (set! (.-onmousedown @hanoi-canvas) handle-mousedown))
 
       :reagent-render
       (fn []
