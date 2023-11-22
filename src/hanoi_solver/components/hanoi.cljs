@@ -23,7 +23,7 @@
    :height height
    :style {:border "1px solid black"}})
 
-(def discs (reagent/atom discs [{:tower 0 :posY 0} {:tower 0 :posY 1} {:tower 0 :posY 2}])) ;; disc 0 is the smallest
+(def discs (reagent/atom discs [{:tower 0 :pos 0} {:tower 0 :pos 1} {:tower 0 :pos 2}])) ;; disc 0 is the smallest
 (comment 
   "An example of discs:
     1
@@ -76,7 +76,8 @@
 ;; (defn get-disk-Y [disk]
 ;;   (+ (- height tower-width) (* (:posY disk) disk-height)))
 (defn get-disk-Y [disk] ;; todo: verify for inputs types
-  (+ (- height tower-width) (* (:posY (@discs disk)) disk-height))) ;;  ! fix this
+  (+ (- height tower-height) (- tower-height (* disk-height (inc (:pos @discs disk))))))
+
 ;;** Probably we can use a function to access the disk :posY key.
 
 (defn get-disk-pos [disk]
