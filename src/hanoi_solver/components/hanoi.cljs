@@ -24,6 +24,7 @@
    :style {:border "1px solid black"}})
 
 (def discs (reagent/atom discs [{:tower 0 :pos 0} {:tower 0 :pos 1} {:tower 0 :pos 2}])) ;; disc 0 is the smallest
+;; we can also have: is-dragging key
 (comment 
   "An example of discs:
     1
@@ -31,6 +32,8 @@
    --- --- ---
     0 is the biggest disc (the first) and 2 is the smallest (the last)
    ")
+
+;; todo: I coded using disk and dics.
 
 ;; -------------------------
 ;; main program
@@ -93,6 +96,7 @@
        (<= mouseY (+ diskY disk-height))))
 
 ;; handle mouse event
+;; todo: this function is just a test for one disc
 (defn handle-mousedown [event]
   (clog event)
   ;; (clog (.-target event))
@@ -102,8 +106,19 @@
         diskY (get-disk-Y 0)]
     (clog (get-disk-Y 0))
     (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
-      (clog "mouse is inside disk")
+      ;;!! fix this
+      (set! discs (assoc @discs [0 :is-dragging] true)) ;; todo: fix for the other discs
       (clog "mouse is OUTSIDE disk"))))
+
+(defn handle-mousemove [event]
+  (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+        mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))]
+    
+    (if (:is-dragging @discs 0)
+      (clog "isdraggin")
+      "no") ;; todo: fix for other discs
+    )
+  )
 
 (defn tower-of-hanoi []
   (let [hanoi-canvas (reagent/atom nil)]
