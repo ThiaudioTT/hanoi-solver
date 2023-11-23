@@ -98,24 +98,33 @@
 ;; handle mouse event
 ;; todo: this function is just a test for one disc
 (defn handle-mousedown [event]
-  (clog event)
-  ;; (clog (.-target event))
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
         diskX (get-disk-X 0)
         diskY (get-disk-Y 0)]
-    (clog (get-disk-Y 0))
     (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
-      ;;!! fix this
-      (set! discs (assoc @discs [0 :is-dragging] true)) ;; todo: fix for the other discs
-      (clog "mouse is OUTSIDE disk"))))
+      ;; todo: fix for other discs
+      (swap! discs #(assoc-in % [0 :is-dragging] true)) 
+      (clog "no"))))
+
+(comment
+  "Debbugs"
+  (println (get @discs 0))
+  (println @discs)
+  (println @discs 0)
+  (println (:is-dragging (get @discs 0)))
+  (clog @discs)
+  (swap! discs true)
+  (swap! discs (constantly false))
+  ( discs (assoc @discs 0 {:tower 1 :pos 0}))
+  )
 
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))]
     
-    (if (:is-dragging @discs 0)
-      (clog "isdraggin")
+    (if (= (:is-dragging (get @discs 0)) true)
+      (clog "WOOOOOOOOOOOOOOOOISGRAGIN")
       "no") ;; todo: fix for other discs
     )
   )
@@ -133,7 +142,8 @@
         (clog (dom/dom-node this))
         (reset! hanoi-canvas (.-firstChild (dom/dom-node this)))
         (draw-canvas-content @hanoi-canvas)
-        (set! (.-onmousedown @hanoi-canvas) handle-mousedown))
+        (set! (.-onmousedown @hanoi-canvas) handle-mousedown)
+        (set! (.-onmousemove @hanoi-canvas) handle-mousemove))
 
       :reagent-render
       (fn []
