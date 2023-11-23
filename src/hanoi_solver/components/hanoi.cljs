@@ -23,7 +23,7 @@
    :height height
    :style {:border "1px solid black"}})
 
-(def discs (reagent/atom discs [{:tower 0 :pos 0} {:tower 0 :pos 1} {:tower 0 :pos 2}])) ;; disc 0 is the smallest
+(def discs (reagent/atom [{:tower 0 :pos 0} {:tower 0 :pos 1} {:tower 0 :pos 2}])) ;; disc 0 is the smallest
 ;; we can also have: is-dragging key
 (comment 
   "An example of discs:
