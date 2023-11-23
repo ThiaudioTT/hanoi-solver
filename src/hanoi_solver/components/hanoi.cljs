@@ -123,18 +123,6 @@
       (swap! discs #(assoc-in % [0 :is-dragging] true)) 
       (clog "no"))))
 
-(comment
-  "Debbugs"
-  (println (get @discs 0))
-  (println @discs)
-  (println @discs 0)
-  (println (:is-dragging (get @discs 0)))
-  (clog @discs)
-  (swap! discs true)
-  (swap! discs (constantly false))
-  ( discs (assoc @discs 0 {:tower 1 :pos 0}))
-  )
-
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
@@ -145,6 +133,9 @@
       "no") ;; todo: fix for other discs
     )
   )
+
+(defn handle-mouseup [event] ;; todo: fix for other discs
+  (swap! discs #(assoc-in % [0 :is-dragging] false)))
 
 (defn tower-of-hanoi []
     (reagent/create-class
@@ -158,9 +149,11 @@
         (reset! hanoi-canvas (.-firstChild (dom/dom-node this)))
         (draw-canvas-content @hanoi-canvas)
         (set! (.-onmousedown @hanoi-canvas) handle-mousedown)
-        (set! (.-onmousemove @hanoi-canvas) handle-mousemove))
+        (set! (.-onmousemove @hanoi-canvas) handle-mousemove)
+        (set! (.-onmouseup @hanoi-canvas) handle-mouseup))
 
       :reagent-render
       (fn []
         [:div.tower-of-hanoi
          [:canvas canvas-style]])}))
+
