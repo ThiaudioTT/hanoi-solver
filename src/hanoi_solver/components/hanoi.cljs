@@ -33,6 +33,8 @@
     0 is the biggest disc (the first) and 2 is the smallest (the last)
    ")
 
+(def hanoi-canvas (reagent/atom nil))
+
 ;; todo: I coded using disk and dics.
 
 ;; -------------------------
@@ -51,17 +53,31 @@
 ;; DISKS
 (defn draw-disk [ctx x y]
   (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
+  (.fillRect ctx x y disk-width disk-height))
+
+(defn draw-disk-in-tower [ctx x y]
+  (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
   (.fillRect ctx x y tower-width tower-height))
 
+;; todo: dont draw disk that is being dragged
 ;; todo: implement N later
 (defn draw-disks [ctx n]
-  (draw-disk ctx tower-edge-spacing (- height disk-height))
+  (draw-disk-in-tower ctx tower-edge-spacing (- height disk-height))
   )
 
 (defn draw-canvas-content [canvas]
   (let [ctx (.getContext canvas "2d")]
     (draw-towers ctx)
     (draw-disks ctx 3)))
+
+;; clear previous disk and draw a new one
+(defn move-disk-to [ctx x y]
+  
+  (.clearRect ctx 0 0 width height)
+  (draw-canvas-content @hanoi-canvas)
+  (draw-disk ctx x y)
+  
+  )
 
 ;; MECHANICS
 
@@ -121,21 +137,20 @@
 
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
-        mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))]
+        mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+        ctx (.getContext @hanoi-canvas "2d")]
     
     (if (= (:is-dragging (get @discs 0)) true)
-      (clog "WOOOOOOOOOOOOOOOOISGRAGIN")
+      (move-disk-to ctx mouseX mouseY) ;; todo: fix for other discs
       "no") ;; todo: fix for other discs
     )
   )
 
 (defn tower-of-hanoi []
-  (let [hanoi-canvas (reagent/atom nil)]
     (reagent/create-class
-     {;;   :component-did-update
-    ;;   (fn [this]
-    ;;     (clog "component-did-update")
-    ;;     (draw-canvas-content (.-firstChild @hanoi-canvas)))
+     {
+      :component-did-update (fn []
+                              (println "component-did-update"))
 
       :component-did-mount
       (fn [this]
@@ -148,4 +163,4 @@
       :reagent-render
       (fn []
         [:div.tower-of-hanoi
-         [:canvas canvas-style]])})))
+         [:canvas canvas-style]])}))
