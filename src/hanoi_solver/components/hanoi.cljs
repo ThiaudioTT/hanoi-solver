@@ -25,7 +25,7 @@
 
 (def discs (reagent/atom [{:tower 0 :pos 0} {:tower 0 :pos 1} {:tower 0 :pos 2}])) ;; disc 0 is the smallest
 ;; we can also have: is-dragging key
-(comment 
+(comment
   "An example of discs:
     1
     0   2
@@ -62,8 +62,7 @@
 ;; todo: dont draw disk that is being dragged
 ;; todo: implement N later
 (defn draw-disks [ctx n]
-  (draw-disk-in-tower ctx tower-edge-spacing (- height disk-height))
-  )
+  (draw-disk-in-tower ctx tower-edge-spacing (- height disk-height)))
 
 (defn draw-canvas-content [canvas]
   (let [ctx (.getContext canvas "2d")]
@@ -72,12 +71,10 @@
 
 ;; clear previous disk and draw a new one
 (defn move-disk-to [ctx x y]
-  
+
   (.clearRect ctx 0 0 width height)
   (draw-canvas-content @hanoi-canvas)
-  (draw-disk ctx x y)
-  
-  )
+  (draw-disk ctx x y))
 
 ;; MECHANICS
 
@@ -120,40 +117,38 @@
         diskY (get-disk-Y 0)]
     (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
       ;; todo: fix for other discs
-      (swap! discs #(assoc-in % [0 :is-dragging] true)) 
+      (swap! discs #(assoc-in % [0 :is-dragging] true))
       (clog "no"))))
 
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
         ctx (.getContext @hanoi-canvas "2d")]
-    
+
     (if (= (:is-dragging (get @discs 0)) true)
       (move-disk-to ctx mouseX mouseY) ;; todo: fix for other discs
       "no") ;; todo: fix for other discs
-    )
-  )
+    ))
 
 (defn handle-mouseup [event] ;; todo: fix for other discs
   (swap! discs #(assoc-in % [0 :is-dragging] false)))
 
 (defn tower-of-hanoi []
-    (reagent/create-class
-     {
-      :component-did-update (fn []
-                              (println "component-did-update"))
+  (reagent/create-class
+   {:component-did-update (fn []
+                            (println "component-did-update"))
 
-      :component-did-mount
-      (fn [this]
-        (clog (dom/dom-node this))
-        (reset! hanoi-canvas (.-firstChild (dom/dom-node this)))
-        (draw-canvas-content @hanoi-canvas)
-        (set! (.-onmousedown @hanoi-canvas) handle-mousedown)
-        (set! (.-onmousemove @hanoi-canvas) handle-mousemove)
-        (set! (.-onmouseup @hanoi-canvas) handle-mouseup))
+    :component-did-mount
+    (fn [this]
+      (clog (dom/dom-node this))
+      (reset! hanoi-canvas (.-firstChild (dom/dom-node this)))
+      (draw-canvas-content @hanoi-canvas)
+      (set! (.-onmousedown @hanoi-canvas) handle-mousedown)
+      (set! (.-onmousemove @hanoi-canvas) handle-mousemove)
+      (set! (.-onmouseup @hanoi-canvas) handle-mouseup))
 
-      :reagent-render
-      (fn []
-        [:div.tower-of-hanoi
-         [:canvas canvas-style]])}))
+    :reagent-render
+    (fn []
+      [:div.tower-of-hanoi
+       [:canvas canvas-style]])}))
 
