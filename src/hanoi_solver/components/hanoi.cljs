@@ -76,7 +76,7 @@
   (.fillRect ctx x y disk-width disk-height))
 
 (defn draw-disk-in-tower [ctx x y]
-  (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors
+  (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors and colors for each disk
   (.fillRect ctx x y disk-width disk-height))
 
 (defn get-disk-tower [^int disk]
