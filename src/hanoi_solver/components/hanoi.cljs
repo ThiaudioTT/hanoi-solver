@@ -57,7 +57,7 @@
 
 (defn draw-disk-in-tower [ctx x y]
   (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
-  (.fillRect ctx x y tower-width tower-height))
+  (.fillRect ctx x y disk-width disk-height))
 
 ;; todo: dont draw disk that is being dragged
 ;; todo: implement N later
