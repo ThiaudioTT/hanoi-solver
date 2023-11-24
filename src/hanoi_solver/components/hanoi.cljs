@@ -40,6 +40,26 @@
 ;; -------------------------
 ;; main program
 
+;; disk is a integer, return a map with the disk position
+(defn get-disk-X [^int disk]
+  ;; todo: I know it is ugly, I will fix it later nyaa <3
+  (if (= (:tower disk) 1)
+    (/ width 2)
+    (if (= (:tower disk) 2)
+      (- width tower-edge-spacing tower-width)
+      tower-edge-spacing)))
+
+;; (defn get-disk-Y [disk]
+;;   (+ (- height tower-width) (* (:posY disk) disk-height)))
+(defn get-disk-Y [^int disk] ;; todo: verify for inputs types
+  (+ (- height tower-height) (- tower-height (* disk-height (inc (:pos @discs disk))))))
+
+;;** Probably we can use a function to access the disk :posY key.
+
+(defn get-disk-pos [disk]
+  {:x (get-disk-X disk)
+   :y (get-disk-Y disk)})
+
 ;; TOWERS
 (defn draw-tower [ctx x y]
   (set! (.-fillStyle ctx) tower-color)
@@ -56,18 +76,30 @@
   (.fillRect ctx x y disk-width disk-height))
 
 (defn draw-disk-in-tower [ctx x y]
-  (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
+  (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors
   (.fillRect ctx x y disk-width disk-height))
 
-;; todo: dont draw disk that is being dragged
-;; todo: implement N later
-(defn draw-disks [ctx n]
-  (draw-disk-in-tower ctx tower-edge-spacing (- height disk-height)))
+(defn get-disk-tower [^int disk]
+  (:tower (get @discs disk))
+  )
 
-(defn draw-canvas-content [canvas]
+(defn draw-all-disks
+  "Draw all disks that are not being dragged in their respective towers"
+  [ctx]
+  (doseq [index (range (count @discs)) disk @discs]
+    (println (:is-dragging disk))
+    (if (not (:is-dragging disk))
+      (draw-disk-in-tower ctx (get-disk-X index) (get-disk-Y index)) nil)))
+
+
+(defn draw-canvas-content
+  "Draw towers and disks, basically set the canvas content"
+  [canvas]
   (let [ctx (.getContext canvas "2d")]
     (draw-towers ctx)
-    (draw-disks ctx 3)))
+    (draw-all-disks ctx))) ;;todo: implement N disks later
+
+
 
 ;; clear previous disk and draw a new one
 (defn move-disk-to [ctx x y]
@@ -76,29 +108,6 @@
   (draw-canvas-content @hanoi-canvas)
   (draw-disk ctx x y))
 
-;; MECHANICS
-
-;; mechanicis helper functions
-
-;; disk is a integer, return a map with the disk position
-(defn get-disk-X [disk]
-  ;; todo: I know it is ugly, I will fix it later nyaa <3
-  (if (= (:tower disk) 1)
-    (/ width 2)
-    (if (= (:tower disk) 2)
-      (- width tower-edge-spacing tower-width)
-      tower-edge-spacing)))
-
-;; (defn get-disk-Y [disk]
-;;   (+ (- height tower-width) (* (:posY disk) disk-height)))
-(defn get-disk-Y [disk] ;; todo: verify for inputs types
-  (+ (- height tower-height) (- tower-height (* disk-height (inc (:pos @discs disk))))))
-
-;;** Probably we can use a function to access the disk :posY key.
-
-(defn get-disk-pos [disk]
-  {:x (get-disk-X disk)
-   :y (get-disk-Y disk)})
 
 ;; todo: refactor, theres a way using math to know where disk is placed
 (defn is-mouse-inside-disk? [mouseX mouseY diskX diskY]
