@@ -15,7 +15,7 @@
 (def tower-edge-spacing 40)
 (def tower-color "black")
 (def disk-height 10)
-(def disk-width 100)
+(def disk-width 100) ;; base disk size
 (def disk-colors ["red" "blue" "green" "yellow"])
 
 (def canvas-style
@@ -23,7 +23,8 @@
    :height height
    :style {:border "1px solid black"}})
 
-(def discs (reagent/atom [{:tower 0 :pos 0} {:tower 0 :pos 1} {:tower 0 :pos 2}])) ;; disc 0 is the smallest
+;; todo: make a fucn to populate discs
+(def discs (reagent/atom [{:tower 0 :pos 0 :width 100} {:tower 0 :pos 1 :width 50} {:tower 0 :pos 2 :width 25}])) ;; pos 0 is the base of the tower, first disk is the greatest
 ;; we can also have: is-dragging key
 (comment
   "An example of discs:
@@ -51,8 +52,11 @@
 
 ;; (defn get-disk-Y [disk]
 ;;   (+ (- height tower-width) (* (:posY disk) disk-height)))
+;; (defn get-disk-Y [^int disk] ;; todo: verify for inputs types
+;;   (+ (- height tower-height) (- tower-height (* disk-height (inc (:pos (get @discs disk)))))))
+
 (defn get-disk-Y [^int disk] ;; todo: verify for inputs types
-  (+ (- height tower-height) (- tower-height (* disk-height (inc (:pos @discs disk))))))
+  (- height (* disk-height (inc (:pos (get @discs disk))))))
 
 ;;** Probably we can use a function to access the disk :posY key.
 
@@ -75,9 +79,11 @@
   (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
   (.fillRect ctx x y disk-width disk-height))
 
-(defn draw-disk-in-tower [ctx x y]
+(defn draw-disk-in-tower 
+  "Draw a especific disk in a especific tower"
+  [ctx x y discSize]
   (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors and colors for each disk
-  (.fillRect ctx x y disk-width disk-height))
+  (.fillRect ctx x y discSize disk-height))
 
 (defn get-disk-tower [^int disk]
   (:tower (get @discs disk))
@@ -87,8 +93,9 @@
   "Draw all disks that are not being dragged in their respective towers"
   [ctx]
   (doseq [index (range (count @discs)) disk @discs]
+    ;; (println index)
     (if (or (not (:is-dragging disk)) (not (nil? (:is-dragging disk))))
-      (draw-disk-in-tower ctx (get-disk-X index) (get-disk-Y index)) nil)))
+      (draw-disk-in-tower ctx (get-disk-X index) (get-disk-Y index) (:width (get @discs index))) nil)))
 
 
 (defn draw-canvas-content
