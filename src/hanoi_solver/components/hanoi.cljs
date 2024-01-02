@@ -87,8 +87,7 @@
   "Draw all disks that are not being dragged in their respective towers"
   [ctx]
   (doseq [index (range (count @discs)) disk @discs]
-    (println (:is-dragging disk))
-    (if (not (:is-dragging disk))
+    (if (or (not (:is-dragging disk)) (not (nil? (:is-dragging disk))))
       (draw-disk-in-tower ctx (get-disk-X index) (get-disk-Y index)) nil)))
 
 
@@ -98,7 +97,6 @@
   (let [ctx (.getContext canvas "2d")]
     (draw-towers ctx)
     (draw-all-disks ctx))) ;;todo: implement N disks later
-
 
 
 ;; clear previous disk and draw a new one
