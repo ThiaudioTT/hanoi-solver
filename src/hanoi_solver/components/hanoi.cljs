@@ -8,11 +8,18 @@
 ;; global vars 
 (def max-disk 8)
 
-(def width 360)
+;; this needs to be correct:
+;; x = tower-edge-spacing
+;; z = tower-width
+;; y = width / 2
+;; 2y = 2x + 2z ;; Needs to be true
+;; width = 2y
+
+(def width 460)
 (def height 250)
-(def tower-width 15)
+(def tower-width 20)
 (def tower-height (/ height 2))
-(def tower-edge-spacing 40)
+(def tower-edge-spacing 100)
 (def tower-color "black")
 (def disk-height 10)
 (def disk-width 100) ;; base disk size
@@ -69,10 +76,12 @@
   (set! (.-fillStyle ctx) tower-color)
   (.fillRect ctx x y tower-width tower-height))
 
+
 (defn draw-towers [ctx]
-  (draw-tower ctx tower-edge-spacing tower-height)
-  (draw-tower ctx (/ width 2) tower-height)
-  (draw-tower ctx (- width tower-edge-spacing tower-width) tower-height))
+  (doseq [index (range 3)]
+    ;; (draw-tower ctx (+ tower-edge-spacing (* index tower-width) (* index tower-edge-spacing)) tower-height)
+    (draw-tower ctx (+ tower-edge-spacing (* index (+ tower-width tower-edge-spacing))) tower-height)
+))
 
 ;; DISKS
 (defn draw-disk [ctx x y]
