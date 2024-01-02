@@ -57,11 +57,6 @@
       (- width tower-edge-spacing tower-width)
       tower-edge-spacing)))
 
-;; (defn get-disk-Y [disk]
-;;   (+ (- height tower-width) (* (:posY disk) disk-height)))
-;; (defn get-disk-Y [^int disk] ;; todo: verify for inputs types
-;;   (+ (- height tower-height) (- tower-height (* disk-height (inc (:pos (get @discs disk)))))))
-
 (defn get-disk-Y [^int disk] ;; todo: verify for inputs types
   (- height (* disk-height (inc (:pos (get @discs disk))))))
 
@@ -72,6 +67,12 @@
    :y (get-disk-Y disk)})
 
 ;; TOWERS
+(defn get-tower-X 
+  "Tower is a number between 0 and 2" ;; todo: verify for inputs types
+  [^number tower]
+  (+ (* (inc tower) tower-edge-spacing) (* tower tower-width))
+)
+
 (defn draw-tower [ctx x y]
   (set! (.-fillStyle ctx) tower-color)
   (.fillRect ctx x y tower-width tower-height))
