@@ -48,30 +48,34 @@
 ;; -------------------------
 ;; main program
 
-;; disk is a integer, return a map with the disk position
-(defn get-disk-X [^int disk]
-  ;; todo: I know it is ugly, I will fix it later nyaa <3
-  (if (= (:tower disk) 1)
-    (/ width 2)
-    (if (= (:tower disk) 2)
-      (- width tower-edge-spacing tower-width)
-      tower-edge-spacing)))
+
+(defn get-tower-X 
+  "Tower is a number between 0 and 2" ;; todo: verify for inputs types
+  [^number tower]
+  (+ (* (inc tower) tower-edge-spacing) (* tower tower-width))
+)
+
+(defn get-disk-tower 
+  "Returns the number of the tower where the disk is"
+  [^int disk]
+  (:tower (get @discs disk))
+  )
+
+(defn get-disk-X
+  "Get the X position of a disk that is in a tower"
+  [^int discIndex]
+  (- (get-tower-X (get-disk-tower discIndex)) (/ (- (:width (get @discs discIndex)) tower-width) 2)))
 
 (defn get-disk-Y [^int disk] ;; todo: verify for inputs types
   (- height (* disk-height (inc (:pos (get @discs disk))))))
 
 ;;** Probably we can use a function to access the disk :posY key.
 
-(defn get-disk-pos [disk]
-  {:x (get-disk-X disk)
-   :y (get-disk-Y disk)})
+;; (defn get-disk-pos [disk]
+;;   {:x (get-disk-X disk)
+;;    :y (get-disk-Y disk)})
 
 ;; TOWERS
-(defn get-tower-X 
-  "Tower is a number between 0 and 2" ;; todo: verify for inputs types
-  [^number tower]
-  (+ (* (inc tower) tower-edge-spacing) (* tower tower-width))
-)
 
 (defn draw-tower [ctx x y]
   (set! (.-fillStyle ctx) tower-color)
@@ -95,9 +99,6 @@
   (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors and colors for each disk
   (.fillRect ctx x y discSize disk-height))
 
-(defn get-disk-tower [^int disk]
-  (:tower (get @discs disk))
-  )
 
 (defn draw-all-disks
   "Draw all disks that are not being dragged in their respective towers"
