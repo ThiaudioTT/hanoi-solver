@@ -31,7 +31,9 @@
    :style {:border "1px solid black"}})
 
 ;; todo: make a fucn to populate discs
-(def discs (reagent/atom [{:tower 0 :pos 0 :width 100 :color "yellow"} {:tower 0 :pos 1 :width 50 :color "orange"} {:tower 0 :pos 2 :width 25 :color "red"}])) ;; pos 0 is the base of the tower, first disk is the greatest
+(def discs (reagent/atom [{:tower 0 :pos 0 :width 100 :color "blue"}
+                          {:tower 0 :pos 1 :width 50 :color "orange"}
+                          {:tower 0 :pos 2 :width 25 :color "red"}])) ;; pos 0 is the base of the tower, first disk is the greatest
 ;; we can also have: is-dragging key
 (comment
   "An example of discs:
@@ -93,20 +95,22 @@
   (set! (.-fillStyle ctx) color)
   (.fillRect ctx x y width height))
 
-(defn draw-disk-in-tower 
-  "Draw a especific disk in a especific tower"
-  [ctx x y discSize]
-  (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors and colors for each disk
-  (.fillRect ctx x y discSize disk-height))
-
+;; (defn draw-disk-in-tower 
+;;   "Draw a especific disk in a especific tower"
+;;   [ctx x y discSize]
+;;   (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors and colors for each disk
+;;   (.fillRect ctx x y discSize disk-height))
 
 (defn draw-all-disks
   "Draw all disks that are not being dragged in their respective towers"
   [ctx]
-  (doseq [index (range (count @discs)) disk @discs]
-    ;; (println index)
-    (if (or (not (:is-dragging disk)) (not (nil? (:is-dragging disk))))
-      (draw-disk-in-tower ctx (get-disk-X index) (get-disk-Y index) (:width (get @discs index))) nil)))
+  
+  (doseq [index (range (count @discs))]
+    (let [disc (get @discs index)]
+
+      (if (or (not (:is-dragging disc)) (not (nil? (:is-dragging disc))))
+        (draw-disk ctx (:width disc) disk-height (get-disk-X index) (get-disk-Y index) (:color disc)) nil))
+    ))
 
 
 (defn draw-canvas-content
