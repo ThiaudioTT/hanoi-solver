@@ -164,6 +164,16 @@
       (apply max (map :pos discsInTower)))
     ))
 
+(defn get-smallest-disc-in-tower
+  "Return the last disc in a tower, nil if tower is empty"
+  [towerIndex]
+
+  (let [discsInTower (get-discs-in-tower towerIndex)]
+    (if (empty? discsInTower)
+      nil
+      (apply max-key :pos discsInTower))
+    ))
+
 (defn move-disk-to-tower
   "Move a disk to a new tower"
   [discIndex newTower]
@@ -279,26 +289,85 @@
       nil))
   )
 
+(defn get-discs-above
+  "Return an array of the discs above the discIndex"
+  [discIndex]
 
-(defn handle-mouseup [event] 
-  (let
-   [discIndex (is-dragging-any-disc)
-    mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
-    mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
-    towerIndex (is-mouse-inside-tower mouseX mouseY)
+  (let [currDiscWidth (:width (get @discs discIndex))
+        discsInTower (get-discs-in-tower (get-disk-tower discIndex))]
+
+    (filter (fn [disc] (< (:width disc) currDiscWidth)) discsInTower))
+)
+  
+
+(defn is-valid-move?
+  "Return true if the move is valid, false otherwise"
+  [discIndex fromTower toTower]
+
+
+  ;; See if the disc is the smallest in the tower
+  (let 
+   [topDisc (get-smallest-disc-in-tower toTower)
+    discsAbove (get-discs-above discIndex)
     ]
 
-    (if (not (nil? discIndex)) ;; stops dragging
-      (swap! discs #(assoc-in % [discIndex :is-dragging] false))
-      nil)
+    (if 
+     (and
+      (or (nil? topDisc) (< (:width (get @discs discIndex)) (:width topDisc)))
+      (not= fromTower toTower)
+      (empty? discsAbove)
+
+      )
+      true
+      false)
+  )
+)
+
+;; (defn handle-mouseup [event] 
+;;   (let
+;;    [discIndex (is-dragging-any-disc)
+;;     mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+;;     mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+;;     towerIndex (is-mouse-inside-tower mouseX mouseY)
+;;     ]
+
+;;     (if (not (nil? discIndex)) ;; stops dragging
+;;       (swap! discs #(assoc-in % [discIndex :is-dragging] false))
+;;       nil)
+
+;;     ;; do the validation an break if not valid
+;;     (if (not (is-valid-move? discIndex (get-disk-tower discIndex) towerIndex))
+;;       (return nil)
+;;       nil
+;;       )
     
-    (if (and (not (nil? discIndex)) (not (nil? towerIndex))) ;; if disc and tower are valid
-      (move-disk-to-tower discIndex towerIndex)
+;;     (if (and (not (nil? discIndex)) (not (nil? towerIndex))) ;; if disc and tower are valid
+;;       (move-disk-to-tower discIndex towerIndex)
+;;       nil)
+
+;;     (draw-canvas-content @hanoi-canvas)
+
+;;     ))
+
+(defn handle-mouseup [event]
+  (let [disc-index (is-dragging-any-disc)
+        mouse-x (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+        mouse-y (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+        tower-index (is-mouse-inside-tower mouse-x mouse-y)]
+
+    (if (not (nil? disc-index)) ;; stops dragging
+      (swap! discs #(assoc-in % [disc-index :is-dragging] false))
       nil)
 
-    (draw-canvas-content @hanoi-canvas)
+    ;; do the validation and break if not valid
+    (if (is-valid-move? disc-index (get-disk-tower disc-index) tower-index)
+      (if (and (not (nil? disc-index)) (not (nil? tower-index))) ;; if disc and tower are valid
+        (move-disk-to-tower disc-index tower-index)
+        nil) nil)
 
-    ))
+    (draw-canvas-content @hanoi-canvas)))
+
+
 
 (defn tower-of-hanoi []
   (reagent/create-class
