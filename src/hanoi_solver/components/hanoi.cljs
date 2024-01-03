@@ -139,6 +139,38 @@
     (draw-disk ctx discWidth discHeight x y discColor))
   )
 
+(defn get-discs-in-tower 
+  "Return an array of the discs in that tower" ;; todo: verify for inputs types
+  [towerIndex]
+  (filter #(= (:tower %) towerIndex) @discs)
+  )
+
+;; (defn get-smallest-disc-in-tower
+;;   "Return the :pos of the smallest disc in a tower"
+;;   [towerIndex]
+
+;;   (let [discsInTower (get-discs-in-tower towerIndex)]
+    
+;;     )
+;;   )
+
+(defn get-greatest-pos-in-tower
+  "Return the :pos of the greatest disc in a tower, -1 if tower is empty"
+  [towerIndex]
+  (let [discsInTower (get-discs-in-tower towerIndex)]
+    (if (empty? discsInTower)
+      -1
+      (apply max (map :pos discsInTower)))
+    ))
+
+(defn move-disk-to-tower
+  "Move a disk to a new tower"
+  [discIndex newTower]
+  
+  (swap! discs #(assoc-in % [discIndex :pos] (inc (get-greatest-pos-in-tower newTower))))
+
+  (swap! discs #(assoc-in % [discIndex :tower] newTower)))
+
 
 ;; todo: refactor, theres a way using math to know where disk is placed
 (defn is-mouse-inside-disk? [mouseX mouseY diskX diskY]
@@ -233,6 +265,8 @@
   (let
    [discIndex (is-dragging-any-disc)]
 
+    (move-disk-to-tower discIndex 1)
+    (draw-all-disks (.getContext @hanoi-canvas "2d"))
     (if (not (nil? discIndex))
       (swap! discs #(assoc-in % [discIndex :is-dragging] false))
       nil)))
