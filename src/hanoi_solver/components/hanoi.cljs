@@ -181,14 +181,37 @@
       ;; (println "ACHOUU" discIndex)
       nil)))
 
+
+(defn is-dragging-any-disc
+  "Return the index of the disc that is being dragged, or nil if not dragging any disc"
+  []
+  (loop [index 0]
+    (if (< index (count @discs))
+      (let [disc (get @discs index)]
+        (if (:is-dragging disc)
+          index
+          (recur (inc index))))
+      nil)))
+
+;; (defn handle-mousemove [event]
+;;   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+;;         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+;;         ctx (.getContext @hanoi-canvas "2d")]
+
+;;     (if (= (:is-dragging (get @discs 0)) true)
+;;       (move-disk-to ctx mouseX mouseY) ;; todo: fix for other discs
+;;       nil) ;; todo: fix for other discs
+;;     ))
+
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
-        ctx (.getContext @hanoi-canvas "2d")]
+        ctx (.getContext @hanoi-canvas "2d")
+        discIndex (is-dragging-any-disc)]
 
-    (if (= (:is-dragging (get @discs 0)) true)
-      (move-disk-to ctx mouseX mouseY) ;; todo: fix for other discs
-      "no") ;; todo: fix for other discs
+    (if (not (nil? discIndex))
+      (move-disk-to ctx mouseX mouseY)
+      nil)
     ))
 
 (defn handle-mouseup [event] ;; todo: fix for other discs
