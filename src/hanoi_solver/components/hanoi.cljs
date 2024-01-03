@@ -127,7 +127,7 @@
 
 ;; todo: refactor, theres a way using math to know where disk is placed
 (defn is-mouse-inside-disk? [mouseX mouseY diskX diskY]
-  (println mouseX mouseY diskX diskY)
+  ;; (println mouseX mouseY diskX diskY)
   (and (>= mouseX diskX)
        (<= mouseX (+ diskX disk-width)) ;; !! todo: disk-width is dinamic
        (>= mouseY diskY)
@@ -135,15 +135,51 @@
 
 ;; handle mouse event
 ;; todo: this function is just a test for one disc
-(defn handle-mousedown [event]
+;; (defn handle-mousedown 
+;;   "Handle the click event on the canvas"
+;;   [event]
+;;   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+;;         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+;;         diskX (get-disk-X 0)
+;;         diskY (get-disk-Y 0)]
+;;     (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
+;;       ;; todo: fix for other discs
+;;       (swap! discs #(assoc-in % [0 :is-dragging] true))
+;;       (clog "no"))))
+
+;; (defn is-mouse-inside-any-disc? 
+;;   "Return the index of the disc that the mouse is inside, or nil if not inside any disc"
+;;   [mouseX mouseY]
+;;   (doseq [index (range (count @discs))]
+;;     (let [discX (get-disk-X index)
+;;           discY (get-disk-Y index)]
+;;       (if (is-mouse-inside-disk? mouseX mouseY discX discY) index nil)
+      
+;;     )
+;;   ))
+
+(defn is-mouse-inside-any-disc?
+  "Return the index of the disc that the mouse is inside, or nil if not inside any disc"
+  [mouseX mouseY]
+  (loop [index 0]
+    (if (< index (count @discs))
+      (let [discX (get-disk-X index)
+            discY (get-disk-Y index)]
+        (if (is-mouse-inside-disk? mouseX mouseY discX discY)
+          index
+          (recur (inc index))))
+      nil)))
+
+(defn handle-mousedown 
+  "Handle the click event on the canvas"
+  [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
-        diskX (get-disk-X 0)
-        diskY (get-disk-Y 0)]
-    (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
-      ;; todo: fix for other discs
-      (swap! discs #(assoc-in % [0 :is-dragging] true))
-      (clog "no"))))
+        discIndex (is-mouse-inside-any-disc? mouseX mouseY)]
+    (if (not (nil? discIndex))
+      (swap! discs #(assoc-in % [discIndex :is-dragging] true))
+      ;; (println "ACHOUU" discIndex)
+      nil)))
 
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
