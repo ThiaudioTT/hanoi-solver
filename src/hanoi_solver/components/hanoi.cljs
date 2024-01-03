@@ -31,7 +31,7 @@
    :style {:border "1px solid black"}})
 
 ;; todo: make a fucn to populate discs
-(def discs (reagent/atom [{:tower 0 :pos 0 :width 100} {:tower 0 :pos 1 :width 50} {:tower 0 :pos 2 :width 25}])) ;; pos 0 is the base of the tower, first disk is the greatest
+(def discs (reagent/atom [{:tower 0 :pos 0 :width 100 :color "yellow"} {:tower 0 :pos 1 :width 50 :color "orange"} {:tower 0 :pos 2 :width 25 :color "red"}])) ;; pos 0 is the base of the tower, first disk is the greatest
 ;; we can also have: is-dragging key
 (comment
   "An example of discs:
@@ -89,9 +89,9 @@
 ))
 
 ;; DISKS
-(defn draw-disk [ctx x y]
-  (set! (.-fillStyle ctx) (first disk-colors)) ;; todo: implement colors
-  (.fillRect ctx x y disk-width disk-height))
+(defn draw-disk [ctx width height x y color]
+  (set! (.-fillStyle ctx) color)
+  (.fillRect ctx x y width height))
 
 (defn draw-disk-in-tower 
   "Draw a especific disk in a especific tower"
@@ -118,11 +118,22 @@
 
 
 ;; clear previous disk and draw a new one
-(defn move-disk-to [ctx x y]
+(defn move-disk-to
+  "Move a disk to a new position"
+  [ctx discIndex x y]
 
-  (.clearRect ctx 0 0 width height)
-  (draw-canvas-content @hanoi-canvas)
-  (draw-disk ctx x y))
+  (let
+   [discWidth (:width (get @discs discIndex))
+    discHeight disk-height
+    ;; discX (get-disk-X discIndex)
+    ;; discY (get-disk-Y discIndex)
+    discColor (:color (get @discs discIndex))
+    ]
+
+    (.clearRect ctx 0 0 width height)
+    (draw-canvas-content @hanoi-canvas)
+    (draw-disk ctx discWidth discHeight x y discColor))
+  )
 
 
 ;; todo: refactor, theres a way using math to know where disk is placed
@@ -210,7 +221,7 @@
         discIndex (is-dragging-any-disc)]
 
     (if (not (nil? discIndex))
-      (move-disk-to ctx mouseX mouseY)
+      (move-disk-to ctx discIndex mouseX mouseY)
       nil)
     ))
 
