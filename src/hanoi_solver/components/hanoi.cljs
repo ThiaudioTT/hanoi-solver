@@ -117,6 +117,7 @@
   "Draw towers and disks, basically set the canvas content"
   [canvas]
   (let [ctx (.getContext canvas "2d")]
+    (.clearRect ctx 0 0 width height) ;; clear canvas
     (draw-towers ctx)
     (draw-all-disks ctx))) ;;todo: implement N disks later
 
@@ -261,15 +262,43 @@
       nil)
     ))
 
-(defn handle-mouseup [event] ;; todo: fix for other discs
-  (let
-   [discIndex (is-dragging-any-disc)]
 
-    (move-disk-to-tower discIndex 1)
-    (draw-all-disks (.getContext @hanoi-canvas "2d"))
-    (if (not (nil? discIndex))
+(defn is-mouse-inside-tower
+  "Return the index of the tower that the mouse is inside, or nil if not inside any tower"
+  [mouseX mouseY]
+  (loop [index 0]
+    (if (< index 3)
+      (let [towerX (get-tower-X index)
+            towerY tower-height]
+        (if (and (>= mouseX towerX)
+                 (<= mouseX (+ towerX tower-width))
+                 (>= mouseY towerY)
+                 (<= mouseY (+ towerY tower-height)))
+          index
+          (recur (inc index))))
+      nil))
+  )
+
+
+(defn handle-mouseup [event] 
+  (let
+   [discIndex (is-dragging-any-disc)
+    mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
+    mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
+    towerIndex (is-mouse-inside-tower mouseX mouseY)
+    ]
+
+    (if (not (nil? discIndex)) ;; stops dragging
       (swap! discs #(assoc-in % [discIndex :is-dragging] false))
-      nil)))
+      nil)
+    
+    (if (and (not (nil? discIndex)) (not (nil? towerIndex))) ;; if disc and tower are valid
+      (move-disk-to-tower discIndex towerIndex)
+      nil)
+
+    (draw-canvas-content @hanoi-canvas)
+
+    ))
 
 (defn tower-of-hanoi []
   (reagent/create-class
