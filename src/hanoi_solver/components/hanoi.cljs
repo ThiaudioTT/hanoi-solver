@@ -230,7 +230,12 @@
     ))
 
 (defn handle-mouseup [event] ;; todo: fix for other discs
-  (swap! discs #(assoc-in % [0 :is-dragging] false)))
+  (let
+   [discIndex (is-dragging-any-disc)]
+
+    (if (not (nil? discIndex))
+      (swap! discs #(assoc-in % [discIndex :is-dragging] false))
+      nil)))
 
 (defn tower-of-hanoi []
   (reagent/create-class
