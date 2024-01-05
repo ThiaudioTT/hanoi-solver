@@ -7,28 +7,44 @@ body {
   font-size: 1.125em;
   color: #333;
   line-height: 1.5em;
+  text-align: center;
 }
 
 h1, h2, h3 {
   color: #000;
 }
+
 h1 {
   font-size: 2.5em
 }
 
-h2 {
-  font-size: 2em
+/* Clojure logo  */
+
+.logo-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  .made-with-clojure {
+    /* remove a styles */
+    text-decoration: none;
+    color: #000;
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    span {
+      margin-bottom: -0.5rem;
+      font-family: 'Courier New', Courier, monospace;
+    }
+  
+    img {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
 }
 
-h3 {
-  font-size: 1.5em
-}
-
-a {
-  text-decoration: none;
-  color: #09f;
-}
-
-a:hover {
-  text-decoration: underline;
-}

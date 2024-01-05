@@ -7,12 +7,18 @@
 ;; -------------------------
 ;; Views
 
+(defn made-with-clojure []
+  [:div.logo-container
+   [:a.made-with-clojure {:href "https://clojure.org/" :target "_blank"}
+    [:span "Made with Clojure!"]
+    [:img {:src "https://clojure.org/images/clojure-logo-120b.png"}]]])
+
 (defn header []
   [:header [:h1 "Tower of Hanoi"]]
 )
 
 (defn home-page []
-  [:div [header] [hanoi/tower-of-hanoi]])
+  [:div [made-with-clojure] [header] [hanoi/tower-of-hanoi]])
 
 ;; -------------------------
 ;; Initialize app
