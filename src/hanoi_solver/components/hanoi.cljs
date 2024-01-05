@@ -323,6 +323,30 @@
   )
 )
 
+(defn did-player-win? 
+  []
+  (loop [index 0]
+    (if (< index (count @discs))
+      (let [disc (get @discs index)]
+        (if (not= (:tower disc) 2)
+          false
+          (recur (inc index))))
+      
+      true
+      )
+    )
+  )
+
+(defn draw-win-message
+  []
+  (let [ctx (.getContext @hanoi-canvas "2d")]
+    (println "You won!")
+    (set! (.-fillStyle ctx) "red")
+    (set! (.-font ctx) "3.5rem Arial")
+    (.fillText ctx "You won!" (+ tower-edge-spacing tower-width) (- height tower-height 40))
+    )
+  )
+
 ;; (defn handle-mouseup [event] 
 ;;   (let
 ;;    [discIndex (is-dragging-any-disc)
@@ -365,7 +389,11 @@
         (move-disk-to-tower disc-index tower-index)
         nil) nil)
 
-    (draw-canvas-content @hanoi-canvas)))
+    (draw-canvas-content @hanoi-canvas)
+
+    (if (= (did-player-win?) true)
+      (draw-win-message) nil)
+    ))
 
 
 
