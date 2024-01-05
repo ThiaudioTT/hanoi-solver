@@ -1,0 +1,56 @@
+body {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-top: 72px;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.125em;
+  color: #333;
+  line-height: 1.5em;
+  text-align: center;
+}
+
+h1, h2, h3 {
+  color: #000;
+}
+
+h1 {
+  font-size: 2.5em
+}
+
+/* Clojure logo  */
+
+.logo-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  .made-with-clojure {
+    /* remove a styles */
+    text-decoration: none;
+    color: #000;
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    span {
+      margin-bottom: -0.5rem;
+      font-family: 'Courier New', Courier, monospace;
+    }
+  
+    img {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+}
+
+footer {
+  margin-top: 2rem;
+  /* font-size: 0.8em; */
+  color: #999;
+}
+
