@@ -92,12 +92,6 @@
   (set! (.-fillStyle ctx) color)
   (.fillRect ctx x y width height))
 
-;; (defn draw-disk-in-tower 
-;;   "Draw a especific disk in a especific tower"
-;;   [ctx x y discSize]
-;;   (set! (.-fillStyle ctx) (rand-nth disk-colors))  ;; todo: implement always different colors and colors for each disk
-;;   (.fillRect ctx x y discSize disk-height))
-
 (defn draw-all-disks
   "Draw all disks that are not being dragged in their respective towers"
   [ctx]
@@ -139,14 +133,6 @@
   [towerIndex]
   (filter #(= (:tower %) towerIndex) @discs))
 
-;; (defn get-smallest-disc-in-tower
-;;   "Return the :pos of the smallest disc in a tower"
-;;   [towerIndex]
-
-;;   (let [discsInTower (get-discs-in-tower towerIndex)]
-
-;;     )
-;;   )
 
 (defn get-greatest-pos-in-tower
   "Return the :pos of the greatest disc in a tower, -1 if tower is empty"
@@ -182,31 +168,6 @@
        (>= mouseY diskY)
        (<= mouseY (+ diskY disk-height))))
 
-;; handle mouse event
-;; todo: this function is just a test for one disc
-;; (defn handle-mousedown 
-;;   "Handle the click event on the canvas"
-;;   [event]
-;;   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
-;;         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
-;;         diskX (get-disk-X 0)
-;;         diskY (get-disk-Y 0)]
-;;     (if (is-mouse-inside-disk? mouseX mouseY diskX diskY)
-;;       ;; todo: fix for other discs
-;;       (swap! discs #(assoc-in % [0 :is-dragging] true))
-;;       (clog "no"))))
-
-;; (defn is-mouse-inside-any-disc? 
-;;   "Return the index of the disc that the mouse is inside, or nil if not inside any disc"
-;;   [mouseX mouseY]
-;;   (doseq [index (range (count @discs))]
-;;     (let [discX (get-disk-X index)
-;;           discY (get-disk-Y index)]
-;;       (if (is-mouse-inside-disk? mouseX mouseY discX discY) index nil)
-
-;;     )
-;;   ))
-
 (defn is-mouse-inside-any-disc?
   "Return the index of the disc that the mouse is inside, or nil if not inside any disc"
   [mouseX mouseY]
@@ -241,16 +202,6 @@
           index
           (recur (inc index))))
       nil)))
-
-;; (defn handle-mousemove [event]
-;;   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
-;;         mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
-;;         ctx (.getContext @hanoi-canvas "2d")]
-
-;;     (if (= (:is-dragging (get @discs 0)) true)
-;;       (move-disk-to ctx mouseX mouseY) ;; todo: fix for other discs
-;;       nil) ;; todo: fix for other discs
-;;     ))
 
 (defn handle-mousemove [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
@@ -325,32 +276,6 @@
     (set! (.-font ctx) "3.5rem Arial")
     (.fillText ctx "You won!" (+ tower-edge-spacing tower-width) (- height tower-height 40))))
 
-;; (defn handle-mouseup [event] 
-;;   (let
-;;    [discIndex (is-dragging-any-disc)
-;;     mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
-;;     mouseY (- (.-clientY event) (.-top (.getBoundingClientRect (.-target event))))
-;;     towerIndex (is-mouse-inside-tower mouseX mouseY)
-;;     ]
-
-;;     (if (not (nil? discIndex)) ;; stops dragging
-;;       (swap! discs #(assoc-in % [discIndex :is-dragging] false))
-;;       nil)
-
-;;     ;; do the validation an break if not valid
-;;     (if (not (is-valid-move? discIndex (get-disk-tower discIndex) towerIndex))
-;;       (return nil)
-;;       nil
-;;       )
-
-;;     (if (and (not (nil? discIndex)) (not (nil? towerIndex))) ;; if disc and tower are valid
-;;       (move-disk-to-tower discIndex towerIndex)
-;;       nil)
-
-;;     (draw-canvas-content @hanoi-canvas)
-
-;;     ))
-
 (defn handle-mouseup [event]
   (let [disc-index (is-dragging-any-disc)
         mouse-x (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
@@ -392,4 +317,3 @@
     (fn []
       [:div.tower-of-hanoi
        [:canvas canvas-style]])}))
-
