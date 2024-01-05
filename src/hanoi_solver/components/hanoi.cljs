@@ -51,17 +51,15 @@
 ;; main program
 
 
-(defn get-tower-X 
+(defn get-tower-X
   "Tower is a number between 0 and 2" ;; todo: verify for inputs types
   [^number tower]
-  (+ (* (inc tower) tower-edge-spacing) (* tower tower-width))
-)
+  (+ (* (inc tower) tower-edge-spacing) (* tower tower-width)))
 
-(defn get-disk-tower 
+(defn get-disk-tower
   "Returns the number of the tower where the disk is"
   [^int disk]
-  (:tower (get @discs disk))
-  )
+  (:tower (get @discs disk)))
 
 (defn get-disk-X
   "Get the X position of a disk that is in a tower"
@@ -87,8 +85,7 @@
 (defn draw-towers [ctx]
   (doseq [index (range 3)]
     ;; (draw-tower ctx (+ tower-edge-spacing (* index tower-width) (* index tower-edge-spacing)) tower-height)
-    (draw-tower ctx (+ tower-edge-spacing (* index (+ tower-width tower-edge-spacing))) tower-height)
-))
+    (draw-tower ctx (+ tower-edge-spacing (* index (+ tower-width tower-edge-spacing))) tower-height)))
 
 ;; DISKS
 (defn draw-disk [ctx width height x y color]
@@ -104,13 +101,12 @@
 (defn draw-all-disks
   "Draw all disks that are not being dragged in their respective towers"
   [ctx]
-  
+
   (doseq [index (range (count @discs))]
     (let [disc (get @discs index)]
 
       (if (or (not (:is-dragging disc)) (not (nil? (:is-dragging disc))))
-        (draw-disk ctx (:width disc) disk-height (get-disk-X index) (get-disk-Y index) (:color disc)) nil))
-    ))
+        (draw-disk ctx (:width disc) disk-height (get-disk-X index) (get-disk-Y index) (:color disc)) nil))))
 
 
 (defn draw-canvas-content
@@ -132,26 +128,23 @@
     discHeight disk-height
     ;; discX (get-disk-X discIndex)
     ;; discY (get-disk-Y discIndex)
-    discColor (:color (get @discs discIndex))
-    ]
+    discColor (:color (get @discs discIndex))]
 
     (.clearRect ctx 0 0 width height)
     (draw-canvas-content @hanoi-canvas)
-    (draw-disk ctx discWidth discHeight x y discColor))
-  )
+    (draw-disk ctx discWidth discHeight x y discColor)))
 
-(defn get-discs-in-tower 
+(defn get-discs-in-tower
   "Return an array of the discs in that tower" ;; todo: verify for inputs types
   [towerIndex]
-  (filter #(= (:tower %) towerIndex) @discs)
-  )
+  (filter #(= (:tower %) towerIndex) @discs))
 
 ;; (defn get-smallest-disc-in-tower
 ;;   "Return the :pos of the smallest disc in a tower"
 ;;   [towerIndex]
 
 ;;   (let [discsInTower (get-discs-in-tower towerIndex)]
-    
+
 ;;     )
 ;;   )
 
@@ -161,8 +154,7 @@
   (let [discsInTower (get-discs-in-tower towerIndex)]
     (if (empty? discsInTower)
       -1
-      (apply max (map :pos discsInTower)))
-    ))
+      (apply max (map :pos discsInTower)))))
 
 (defn get-smallest-disc-in-tower
   "Return the last disc in a tower, nil if tower is empty"
@@ -171,13 +163,12 @@
   (let [discsInTower (get-discs-in-tower towerIndex)]
     (if (empty? discsInTower)
       nil
-      (apply max-key :pos discsInTower))
-    ))
+      (apply max-key :pos discsInTower))))
 
 (defn move-disk-to-tower
   "Move a disk to a new tower"
   [discIndex newTower]
-  
+
   (swap! discs #(assoc-in % [discIndex :pos] (inc (get-greatest-pos-in-tower newTower))))
 
   (swap! discs #(assoc-in % [discIndex :tower] newTower)))
@@ -212,7 +203,7 @@
 ;;     (let [discX (get-disk-X index)
 ;;           discY (get-disk-Y index)]
 ;;       (if (is-mouse-inside-disk? mouseX mouseY discX discY) index nil)
-      
+
 ;;     )
 ;;   ))
 
@@ -228,7 +219,7 @@
           (recur (inc index))))
       nil)))
 
-(defn handle-mousedown 
+(defn handle-mousedown
   "Handle the click event on the canvas"
   [event]
   (let [mouseX (- (.-clientX event) (.-left (.getBoundingClientRect (.-target event))))
@@ -269,8 +260,7 @@
 
     (if (not (nil? discIndex))
       (move-disk-to ctx discIndex mouseX mouseY)
-      nil)
-    ))
+      nil)))
 
 
 (defn is-mouse-inside-tower
@@ -286,8 +276,7 @@
                  (<= mouseY (+ towerY tower-height)))
           index
           (recur (inc index))))
-      nil))
-  )
+      nil)))
 
 (defn get-discs-above
   "Return an array of the discs above the discIndex"
@@ -296,9 +285,8 @@
   (let [currDiscWidth (:width (get @discs discIndex))
         discsInTower (get-discs-in-tower (get-disk-tower discIndex))]
 
-    (filter (fn [disc] (< (:width disc) currDiscWidth)) discsInTower))
-)
-  
+    (filter (fn [disc] (< (:width disc) currDiscWidth)) discsInTower)))
+
 
 (defn is-valid-move?
   "Return true if the move is valid, false otherwise"
@@ -306,24 +294,19 @@
 
 
   ;; See if the disc is the smallest in the tower
-  (let 
+  (let
    [topDisc (get-smallest-disc-in-tower toTower)
-    discsAbove (get-discs-above discIndex)
-    ]
+    discsAbove (get-discs-above discIndex)]
 
-    (if 
+    (if
      (and
       (or (nil? topDisc) (< (:width (get @discs discIndex)) (:width topDisc)))
       (not= fromTower toTower)
-      (empty? discsAbove)
-
-      )
+      (empty? discsAbove))
       true
-      false)
-  )
-)
+      false)))
 
-(defn did-player-win? 
+(defn did-player-win?
   []
   (loop [index 0]
     (if (< index (count @discs))
@@ -331,11 +314,8 @@
         (if (not= (:tower disc) 2)
           false
           (recur (inc index))))
-      
-      true
-      )
-    )
-  )
+
+      true)))
 
 (defn draw-win-message
   []
@@ -343,9 +323,7 @@
     (println "You won!")
     (set! (.-fillStyle ctx) "red")
     (set! (.-font ctx) "3.5rem Arial")
-    (.fillText ctx "You won!" (+ tower-edge-spacing tower-width) (- height tower-height 40))
-    )
-  )
+    (.fillText ctx "You won!" (+ tower-edge-spacing tower-width) (- height tower-height 40))))
 
 ;; (defn handle-mouseup [event] 
 ;;   (let
@@ -364,7 +342,7 @@
 ;;       (return nil)
 ;;       nil
 ;;       )
-    
+
 ;;     (if (and (not (nil? discIndex)) (not (nil? towerIndex))) ;; if disc and tower are valid
 ;;       (move-disk-to-tower discIndex towerIndex)
 ;;       nil)
@@ -392,8 +370,7 @@
     (draw-canvas-content @hanoi-canvas)
 
     (if (= (did-player-win?) true)
-      (draw-win-message) nil)
-    ))
+      (draw-win-message) nil)))
 
 
 
