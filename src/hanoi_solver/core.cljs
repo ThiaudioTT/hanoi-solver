@@ -17,8 +17,12 @@
   [:header [:h1 "Tower of Hanoi"]]
 )
 
+(defn footer []
+  [:footer [:a {:href "https://github.com/ThiaudioTT/tower-of-hanoi" :target "_blank" :style {:text-decoration "none" :color "gray"}} "Github"]]
+)
+
 (defn home-page []
-  [:div [made-with-clojure] [header] [hanoi/tower-of-hanoi]])
+  [:div [made-with-clojure] [header] [hanoi/tower-of-hanoi] [footer]])
 
 ;; -------------------------
 ;; Initialize app
